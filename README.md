@@ -3,9 +3,17 @@
 Shared simulation infrastructure for a robotics research project. No policy model
 has been chosen. No model weights or demonstration datasets are downloaded.
 
+**Research question:** not yet selected. Define it with the team before choosing
+a policy or launching the main comparison.
+
+Read [MODAL_GUIDELINES.md](MODAL_GUIDELINES.md) for the course requirements,
+onboarding checklist, compute/storage policies, and experiment best practices.
+
 **Status:** Python syntax checked; not yet built or run on Modal. The first team
 milestone is verifying installation, offscreen rendering, and saved observations.
 This is a proposed compatible dependency set, not a fully locked environment.
+`requirements.lock` is a documented placeholder to fill after the first successful
+remote run; do not install it as though it were a validated lockfile.
 
 ## What runs where?
 
@@ -21,11 +29,33 @@ Use Python 3.10 or newer locally. On Mac/Linux:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install modal
+python -m pip install -e .
 modal setup
-modal run modal_app.py --mode list
-modal run modal_app.py --mode smoke --task-id 0 --steps 60
+modal profile list
+modal profile activate COURSE_PROFILE
+modal profile current
+modal environment list
+modal config set-environment PROJECT_ENV
+modal config show
+
+# Replace these with the exact Environment and existing Volume supplied by staff.
+export CS2243_PROJECT_ENV=PROJECT_ENV
+export CS2243_VOLUME_NAME=YOUR_VOLUME_NAME
+
+# Complete course onboarding first: one T4, one container, five-minute limit.
+modal run --env="$CS2243_PROJECT_ENV" modal_test.py
+
+# Then verify the simulator on L4.
+modal run --env="$CS2243_PROJECT_ENV" modal_app.py --mode list
+modal run --env="$CS2243_PROJECT_ENV" modal_app.py --mode smoke --task-id 0 --steps 60
 ```
+
+Run from the repository root. `COURSE_PROFILE`, `PROJECT_ENV`, and
+`YOUR_VOLUME_NAME` are placeholders: discover the first two with the list commands
+and obtain the Volume name from staff. Export the two `CS2243_` variables in each
+new shell. The launcher refuses missing names and checks the remote Environment;
+it uses the existing Volume without creating one. No personal payment method is
+needed. Stop and contact staff if billing or restricted access looks wrong.
 
 The first run builds a reusable cloud image. A smoke test runs in one container
 with a ten-minute timeout. It sends zero pose commands and an open-gripper command;
@@ -34,43 +64,56 @@ the robot should mostly stay still. This is NOT expected to solve the task.
 Open the printed `outputs/<run-id>/rollout.mp4` on your laptop. That folder also
 contains two camera snapshots, `last_observation.npz`, `summary.json`, upstream
 commit information, and `pip-freeze.txt`. Copies persist in the Modal Volume
-`libero-starter-results`. Failed runs save `error.txt` there when possible.
+named by `CS2243_VOLUME_NAME`, mounted at `/results`. Failed runs save `error.txt`
+there when possible. Local downloads remain in ignored `outputs/`; only small
+reported tables and plots belong in `results/` in Git.
 
 Try another task or initial state:
 
 ```bash
-modal run modal_app.py --task-id 1 --init-state-id 2
-modal run modal_app.py --suite libero_goal --task-id 0
+modal run --env="$CS2243_PROJECT_ENV" modal_app.py --task-id 1 --init-state-id 2
+modal run --env="$CS2243_PROJECT_ENV" modal_app.py --suite libero_goal --task-id 0
 ```
 
 ## What is in this repo?
 
-- `modal_app.py`: cloud environment, task listing, remote launch, result download.
-- `sim/rollout.py`: configuration, environment creation, initial state, stepping,
-  success check, observations and video. This is independent of a policy model.
-- `requirements-sim.txt`: selected simulator dependencies.
-- `.gitignore`: excludes generated outputs, weights, datasets, and credentials.
+```text
+.
+├── README.md
+├── MODAL_GUIDELINES.md       # course policies and best practices
+├── pyproject.toml           # local package and Modal dependency
+├── requirements.lock        # pending exact tested remote dependency lock
+├── requirements-sim.txt     # candidate direct simulator dependency pins
+├── modal_app.py             # Image, Functions, existing Volume, local launch
+├── modal_test.py            # course T4 onboarding check
+├── src/
+│   └── sim/rollout.py        # policy-independent simulator implementation
+├── configs/                 # immutable experiment configurations
+├── scripts/                 # future evaluation and aggregation entrypoints
+├── tests/                   # fast checks without cloud dependencies
+├── results/                 # small reported tables/plots and shared run log
+└── .gitignore
+```
+
+`src/sim/rollout.py` handles environment creation, initial states, stepping,
+success checks, observations, and video. The Image includes the `src` package and
+copies `configs/` to `/root/configs`. The current CLI takes arguments directly;
+config-driven research and full policy evaluation are still to be implemented.
+
+Run the local checks with `python3 -m unittest discover -s tests -v`. After a
+successful remote smoke run, use the saved `pip-freeze.txt` and image/upstream
+metadata to produce the tested lock described in `requirements.lock`.
 
 The official LIBERO repository is installed at a pinned commit inside the image;
 we do not copy or modify its source in this repository.
 
 ## Sharing on GitHub
 
-Create an EMPTY private GitHub repository named `libero-starter` (no README).
-Inside this downloaded folder, run:
-
-```bash
-git init -b main
-git add .
-git commit -m "Add policy-independent LIBERO simulation starter"
-git remote add origin https://github.com/YOUR_USERNAME/libero-starter.git
-git push -u origin main
-```
-
-Replace YOUR_USERNAME. Add teammates in repository Settings > Collaborators.
+Use the team's private GitHub repository and add teammates as collaborators.
 Each teammate clones the repository and follows Quick start. Each runs `modal
 setup` with their own account. To use the same credits/Volume, they need access
-to the same Modal workspace; GitHub access alone does not grant that access.
+to the course Workspace and the same restricted project Environment; GitHub
+access alone does not grant that access. Use only the staff-provided team Volume.
 Never commit or share Modal authentication tokens. Work in branches and use PRs.
 
 ## First team tasks
@@ -108,4 +151,4 @@ success aggregation, latency timing, and checkpoint provenance.
 - https://modal.com/docs/guide/images
 
 
-God help us. 
+God help us.

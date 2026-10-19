@@ -1,0 +1,11 @@
+# PENDING: this file is a lockfile placeholder, not an installable environment.
+# No Modal image build or successful simulator run has been verified yet.
+# Candidate simulator pins live in requirements-sim.txt; torch and the LIBERO
+# revision are pinned in modal_app.py. Modal itself is not yet pinned.
+# After a successful smoke run, replace these comments with exact tested remote
+# dependency versions from that run's pip-freeze.txt. Record Python, image,
+# LIBERO revision, Git commit, and build instructions alongside the lock.
+# Review editable /opt/LIBERO entries: recreate them via the pinned image build,
+# rather than treating a container-local path as a portable dependency.
+# Freeze the local Modal SDK version separately; the laptop and remote images
+# intentionally have different dependencies. Do not use this placeholder with pip.

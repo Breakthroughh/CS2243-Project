@@ -1,11 +1,16 @@
 """Run LIBERO on Modal without selecting or downloading any policy model."""
 from pathlib import Path
+import os
 import modal
 
 ROOT = Path(__file__).parent
 LIBERO_COMMIT = "8f1084e3132a39270c3a13ebe37270a43ece2a01"
-app = modal.App("libero-starter")
-volume = modal.Volume.from_name("libero-starter-results", create_if_missing=True)
+PROJECT = os.environ.get("CS2243_PROJECT_ENV", "").strip()
+VOLUME_NAME = os.environ.get("CS2243_VOLUME_NAME", "").strip()
+if not PROJECT or not VOLUME_NAME:
+    raise ValueError("Set CS2243_PROJECT_ENV and CS2243_VOLUME_NAME to the staff-assigned names.")
+app = modal.App(f"{PROJECT}-libero-smoke", tags={"project": PROJECT, "purpose": "pilot"})
+volume = modal.Volume.from_name(VOLUME_NAME)
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .apt_install("git", "ffmpeg", "libegl1", "libgl1", "libglib2.0-0")
@@ -16,13 +21,20 @@ image = (
                   "pip install --no-deps -e /opt/LIBERO")
     .env({"MUJOCO_GL": "egl", "PYOPENGL_PLATFORM": "egl",
           "NVIDIA_DRIVER_CAPABILITIES": "compute,utility,graphics",
-          "LIBERO_CONFIG_PATH": "/root/.libero", "PYTHONPATH": "/workspace:/opt/LIBERO"})
-    .add_local_dir(str(ROOT / "sim"), remote_path="/workspace/sim")
+          "LIBERO_CONFIG_PATH": "/root/.libero", "PYTHONPATH": "/root:/opt/LIBERO"})
+    .add_local_python_source("src")
+    .add_local_dir(str(ROOT / "configs"), remote_path="/root/configs")
 )
 
-@app.function(image=image, timeout=300)
+def check_environment():
+    if os.environ.get("MODAL_ENVIRONMENT") != PROJECT:
+        raise RuntimeError(f"Wrong Modal Environment; run with --env={PROJECT}")
+
+
+@app.function(image=image, timeout=300, max_containers=1)
 def tasks(suite: str):
-    from sim.rollout import list_tasks
+    check_environment()
+    from src.sim.rollout import list_tasks
     return list_tasks(suite)
 
 @app.function(image=image, gpu="L4", cpu=2, memory=8192,
@@ -33,7 +45,8 @@ def smoke(suite: str, task_id: int, init_state_id: int, steps: int, seed: int):
     import sys
     import traceback
     import uuid
-    from sim.rollout import rollout
+    check_environment()
+    from src.sim.rollout import rollout
     directory = Path("/results") / uuid.uuid4().hex[:12]
     directory.mkdir(parents=True)
     (directory / "environment.json").write_text(json.dumps({"libero_commit": LIBERO_COMMIT}))

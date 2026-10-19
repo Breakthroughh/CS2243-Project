@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cs2243-libero-starter"
+version = "0.1.0"
+description = "Policy-independent LIBERO simulation infrastructure on Modal"
+requires-python = ">=3.10"
+dependencies = ["modal"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src", "src.*"]

@@ -1,0 +1,1 @@
+run_id,purpose,hypothesis,git_commit,git_dirty,dependency_lock,image_definition,data_version,model_revision,config_path,seed,gpu_type,gpu_count,cpu_cores,memory_mib,timeout_seconds,max_containers,forecast_cost_usd,actual_cost_usd,runtime_seconds,status,failure_reason,metrics_path,artifact_path,next_decision

@@ -7,3 +7,15 @@ outputs/
 .DS_Store
 checkpoints/
 data/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.cache/
+.modal.toml
+*.ckpt
+*.pt
+*.pth
+*.safetensors
