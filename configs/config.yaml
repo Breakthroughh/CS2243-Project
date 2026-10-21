@@ -13,5 +13,5 @@ git:
   branch: ???
   commit: ???
   dirty: ???
-wandb: {project: cs2243-diffusion-policy, entity: null, mode: online}
-hf: {namespace: null}   # set to push final policy to <namespace>/<branch>-<name> (private)
+wandb: {project: cs2243-diffusion-policy, entity: jackfandev-harvard-university, mode: online}
+hf: {namespace: null}   # e.g. jackfanml; set to push final policy to <namespace>/<branch>-<name> (private)
