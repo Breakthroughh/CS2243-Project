@@ -1,4 +1,4 @@
-"""Contract for the training loop you write in src/train.py. Delete the xfail marker once implemented.
+"""Contract for the training loop in src/train.py.
 Dims: B batch, P action horizon, S state (8), A action (7)."""
 from pathlib import Path
 
@@ -10,9 +10,6 @@ from src.data import build_datasets
 from src.policy import Policy
 from src.train import train
 from tests.conftest import logged
-
-pytestmark = pytest.mark.xfail(raises=NotImplementedError, reason="src/train.py:train not implemented yet")
-
 
 class Linear(Policy):
     def __init__(self):

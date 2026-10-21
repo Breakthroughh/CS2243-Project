@@ -35,9 +35,10 @@ class NoOpPolicy(Policy):
         super().__init__()
         self.action_horizon = action_horizon
         self.register_buffer("action_A", torch.tensor([0, 0, 0, 0, 0, 0, -1.0]))
+        self.dummy = nn.Parameter(torch.zeros(()))  # never affects actions; lets backward/optimizer/ckpt run end-to-end
 
     def predict_action(self, obs):
         return self.action_A.expand(obs["state"].shape[0], self.action_horizon, -1)
 
     def compute_loss(self, batch):
-        return {"loss": F.mse_loss(self.predict_action(batch), batch["action"])}
+        return {"loss": F.mse_loss(self.predict_action(batch), batch["action"]) + 0 * self.dummy}
