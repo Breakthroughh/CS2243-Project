@@ -100,19 +100,17 @@ billing, permissions, persistence, or credential behavior rather than guessing.
 ## Onboarding checklist
 
 - [ ] Accept the invitation; verify the course Workspace and restricted team access.
-- [ ] Create/activate a local Python environment, install Modal, and authenticate.
+- [ ] Create the local environment with `uv sync`, then authenticate Modal.
 - [ ] Identify and activate the course CLI profile.
 - [ ] Identify/set the project Environment; verify the resulting CLI configuration.
-- [ ] Run the committed `modal_test.py` with an explicit Environment and confirm
+- [ ] Run the committed `compute/onboarding.py` with an explicit Environment and confirm
       the returned Environment, CUDA computation, T4 identity, and successful exit.
 - [ ] Confirm the staff-provided Volume name and mount path.
 - [ ] Read the allocation, function limits, and checkpoint requirements before research runs.
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -e .
+uv sync                     # creates .venv (Python 3.10) from uv.lock
+source .venv/bin/activate   # or prefix commands with `uv run`
 modal setup
 modal profile list
 modal profile activate COURSE_PROFILE
@@ -124,7 +122,7 @@ modal config show
 # Replace both placeholders with the exact staff-assigned names.
 export CS2243_PROJECT_ENV=PROJECT_ENV
 export CS2243_VOLUME_NAME=YOUR_VOLUME_NAME
-modal run --env="$CS2243_PROJECT_ENV" modal_test.py
+modal run --env="$CS2243_PROJECT_ENV" compute/onboarding.py
 ```
 
 `modal setup` also works as `python -m modal setup`. Each teammate authenticates
@@ -150,13 +148,11 @@ project-repository/
 └── .gitignore              # credentials, data, caches, environment files
 ```
 
-This repo additionally keeps `modal_test.py`, `requirements-sim.txt`, and this
-document. The simulator lives in `src/sim/`; `modal_app.py` includes `src` and
-`configs` in the remote Image. Keep substantial research logic in the team Git
+This repo keeps Modal code in `compute/` (`app.py`, `onboarding.py`, `requirements.txt`);
+`compute/app.py` adds `src` to the remote Image and composes `configs/` locally.
+See [AGENTS.md](AGENTS.md) for layout and workflow. Keep substantial research logic in the team Git
 repository, reviewed through branches/PRs. Notebooks should not diverge into a
-second authoritative implementation. Multi-file Apps can use module mode
-(`modal run -m src.app`) when the App is actually in that module; this starter
-keeps its App at the top level and uses `modal run modal_app.py`.
+second authoritative implementation.
 
 ## Best practices for experiments
 
@@ -168,9 +164,9 @@ keeps its App at the top level and uses `modal run modal_app.py`.
   upstream revisions. Record dependency changes with the config and Git commit;
   avoid upgrades midway through a main comparison.
 - **Current limitation:** `requirements.lock` is explicitly a placeholder.
-  `requirements-sim.txt` contains candidate direct pins; `modal_app.py` pins torch
+  `compute/requirements.txt` contains candidate direct pins; `compute/app.py` pins torch
   and LIBERO. No successful remote build has validated a complete dependency lock.
-  After the first successful smoke run, preserve its `pip-freeze.txt`, record the
+  After the first successful smoke run, preserve its `freeze.txt`, record the
   Image/Python/LIBERO revision, replace the placeholder with tested versions, and
   separately freeze the local Modal SDK. Review nonportable editable package paths.
 - Save complete, immutable configs under `configs/`. Record the exact launch
@@ -261,8 +257,8 @@ modal config show
 modal volume list --env="$CS2243_PROJECT_ENV"
 modal volume ls --env="$CS2243_PROJECT_ENV" "$CS2243_VOLUME_NAME" /
 modal volume get --env="$CS2243_PROJECT_ENV" "$CS2243_VOLUME_NAME" /path/in/volume ./local-output
-modal run --env="$CS2243_PROJECT_ENV" modal_app.py --mode list
-modal run --env="$CS2243_PROJECT_ENV" --detach modal_app.py
+modal run --env="$CS2243_PROJECT_ENV" compute/app.py::tasks --suite libero_spatial
+modal run --env="$CS2243_PROJECT_ENV" --detach compute/app.py --name RUN_NAME
 modal app logs --env="$CS2243_PROJECT_ENV" APP_ID
 modal app stop --env="$CS2243_PROJECT_ENV" APP_ID
 ```

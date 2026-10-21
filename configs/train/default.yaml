@@ -1,0 +1,5 @@
+epochs: 0        # 0 = eval only (no-op baseline)
+batch_size: 64
+lr: 1.0e-4
+num_workers: 4
+eval_every: 10   # epochs

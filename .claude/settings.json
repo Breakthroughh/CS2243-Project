@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(modal run:*)",
+      "Bash(modal deploy:*)",
+      "Bash(uv run modal run:*)",
+      "Bash(uv run modal deploy:*)",
+      "Bash(python -m modal run:*)",
+      "Bash(python -m modal deploy:*)",
+      "Edit(**/EXPERIMENT_LOG.md)",
+      "Write(**/EXPERIMENT_LOG.md)"
+    ]
+  }
+}

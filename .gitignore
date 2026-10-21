@@ -6,7 +6,7 @@ outputs/
 .env.*
 .DS_Store
 checkpoints/
-data/
+/data/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -19,3 +19,8 @@ dist/
 *.pt
 *.pth
 *.safetensors
+
+prompts/
+.python-version
+.claude/worktrees/
+.claude/settings.local.json

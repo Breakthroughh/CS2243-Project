@@ -10,9 +10,9 @@ if not PROJECT:
 
 app = modal.App(f"{PROJECT}-test", tags={"project": PROJECT, "purpose": "onboarding"})
 # Candidate versions shared with the starter; the research lock remains pending.
-image = modal.Image.debian_slim(python_version="3.10").pip_install(
+image = modal.Image.debian_slim(python_version="3.10").uv_pip_install(
     "torch==2.2.2", "numpy==1.26.4"
-)
+).env({"CS2243_PROJECT_ENV": PROJECT})  # module is re-imported in the container
 
 
 @app.function(image=image, gpu="T4", cpu=0.5, memory=4096,

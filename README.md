@@ -24,12 +24,11 @@ A future GPU policy needs a CUDA-enabled PyTorch environment of its own.
 
 ## Quick start (Mac, Linux, or Windows with an appropriate Python shell)
 
-Use Python 3.10 or newer locally. On Mac/Linux:
+Install [uv](https://docs.astral.sh/uv/). It pins Python 3.10 (`.python-version`) to match the Modal image:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e .
+uv sync
+source .venv/bin/activate   # or prefix commands with `uv run`
 modal setup
 modal profile list
 modal profile activate COURSE_PROFILE
@@ -100,7 +99,7 @@ success checks, observations, and video. The Image includes the `src` package an
 copies `configs/` to `/root/configs`. The current CLI takes arguments directly;
 config-driven research and full policy evaluation are still to be implemented.
 
-Run the local checks with `python3 -m unittest discover -s tests -v`. After a
+Run the local checks with `uv run pytest -q`. After a
 successful remote smoke run, use the saved `pip-freeze.txt` and image/upstream
 metadata to produce the tested lock described in `requirements.lock`.
 

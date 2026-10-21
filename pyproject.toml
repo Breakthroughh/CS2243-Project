@@ -3,12 +3,21 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cs2243-libero-starter"
+name = "cs2243-robot-denoising-efficiency"
 version = "0.1.0"
-description = "Policy-independent LIBERO simulation infrastructure on Modal"
+description = "Diffusion robot policy research on LIBERO, run on Modal"
 requires-python = ">=3.10"
-dependencies = ["modal"]
+# Local env (launcher + tests). Remote image pins live in compute/requirements.txt.
+dependencies = ["modal", "torch", "numpy", "h5py", "hydra-core", "wandb", "huggingface_hub", "safetensors",
+                "einops", "imageio[ffmpeg]", "pyyaml"]
+
+[dependency-groups]
+dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["src", "src.*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
