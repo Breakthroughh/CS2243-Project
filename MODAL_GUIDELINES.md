@@ -163,12 +163,10 @@ second authoritative implementation.
 - After the baseline works, pin exact tested dependencies, Python version, and
   upstream revisions. Record dependency changes with the config and Git commit;
   avoid upgrades midway through a main comparison.
-- **Current limitation:** `requirements.lock` is explicitly a placeholder.
-  `compute/requirements.txt` contains candidate direct pins; `compute/app.py` pins torch
-  and LIBERO. No successful remote build has validated a complete dependency lock.
-  After the first successful smoke run, preserve its `freeze.txt`, record the
-  Image/Python/LIBERO revision, replace the placeholder with tested versions, and
-  separately freeze the local Modal SDK. Review nonportable editable package paths.
+- `requirements.lock` is the tested remote lock from the `e2e-smoke` run's `freeze.txt`
+  (2026-10-21); `compute/requirements.txt` holds the direct pins and `compute/app.py` pins
+  torch and LIBERO. The local env (incl. Modal SDK) is locked by `uv.lock`. Regenerate the
+  lock from a new run's `freeze.txt` whenever the image dependencies change.
 - Save complete, immutable configs under `configs/`. Record the exact launch
   command, config, and source revision; commit small reported artifacts in `results/`.
 
