@@ -9,7 +9,7 @@ description = "Diffusion robot policy research on LIBERO, run on Modal"
 requires-python = ">=3.10"
 # Local env (launcher + tests). Remote image pins live in compute/requirements.txt.
 dependencies = ["modal", "torch", "numpy", "h5py", "hydra-core", "wandb", "huggingface_hub", "safetensors",
-                "einops", "imageio[ffmpeg]", "pyyaml"]
+                "einops", "imageio[ffmpeg]", "pyyaml", "torchvision==0.17.2", "transformers==4.46.3"]
 
 [dependency-groups]
 dev = ["pytest"]

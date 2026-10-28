@@ -20,7 +20,7 @@ volume = modal.Volume.from_name(VOLUME_NAME)
 image = (
     modal.Image.debian_slim(python_version="3.10")
     .apt_install("git", "ffmpeg", "libegl1", "libgl1", "libglib2.0-0")
-    .uv_pip_install("torch==2.2.2")  # default PyPI wheel = CUDA 12.1
+    .uv_pip_install("torch==2.2.2", "torchvision==0.17.2")  # default PyPI wheel = CUDA 12.1
     .uv_pip_install(requirements=[str(ROOT / "compute/requirements.txt")])
     .run_commands("git clone https://github.com/Lifelong-Robot-Learning/LIBERO.git /opt/LIBERO",
                   f"git -C /opt/LIBERO checkout {LIBERO_COMMIT}")
