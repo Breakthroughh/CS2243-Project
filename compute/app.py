@@ -56,7 +56,7 @@ def tasks(suite: str):
 
 @app.function(image=image, gpu="L4", cpu=4, memory=16384, volumes={"/results": volume},
               secrets=[modal.Secret.from_name("wandb"), modal.Secret.from_name("huggingface")],
-              timeout=21600, max_containers=4)  # 6 h; set from pilot measurements
+              timeout=7200, max_containers=4)  # 2 h for pilots; set from pilot measurements
 def run(cfg: dict):
     check_environment()
     from importlib.metadata import distributions
