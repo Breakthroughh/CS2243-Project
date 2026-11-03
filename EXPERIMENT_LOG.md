@@ -12,3 +12,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: set up infra
     - Expected: this shit works
     - Results: 
+- 2026-11-03: `dit-pilot`
+    - Changes: running a test first one
+    - Expected: i expect it to be ok
+    - Results: 
+    - running da pilot fr
