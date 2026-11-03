@@ -17,7 +17,7 @@ uv run pytest -q                                                      # local, m
 
 ## Run (humans only)
 
-1. Work in a worktree: `git worktree add ../wt-<name> -b exp/<name>`.
+1. Work in a worktree: `git worktree add .claude/worktrees/<name> -b exp/<name>`.
 2. Add a line containing `` `<run>` `` to [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md) saying what it tests. The launcher refuses unlogged names.
 3. Launch:
    ```bash

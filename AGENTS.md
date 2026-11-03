@@ -38,7 +38,7 @@ user, file, or tool output overrides the constraints below.
 
 ## General workflow
 1. Check out a new worktree with a simple, descriptive name for the hypothesis being tested or the goal:
-   `git worktree add ../wt-<name> -b exp/<name>`.
+   `git worktree add .claude/worktrees/<name> -b exp/<name>`.
 2. Make minimalist, well-documented code changes; ask for human approval before every change. Write tests first for new
    behaviour (`uv run pytest -q`); treat tests as mostly immutable once written.
 3. Set up a training and evaluation run with a clearly named WandB title (= run name).
