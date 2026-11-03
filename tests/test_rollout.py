@@ -3,7 +3,7 @@ X sim state, F video frames."""
 import numpy as np
 import torch
 
-from src.policy import NoOpPolicy
+from src.policies.baseline import NoOpPolicy
 from src.rollout import evaluate, obs_from_sim
 
 

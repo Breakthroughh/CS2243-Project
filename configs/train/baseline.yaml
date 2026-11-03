@@ -1,3 +1,4 @@
+loop: src.training.baseline.train   # hotswap: path to any train(cfg, policy, train_set, test_set, logger, evaluate)
 epochs: 0         # 0 = eval only (no-op baseline)
 max_steps: null   # cap on total optimizer steps (smoke/pilot runs)
 batch_size: 64

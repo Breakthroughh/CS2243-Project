@@ -2,7 +2,7 @@ defaults:
   - policy: noop
   - data: libero
   - eval: libero
-  - train: default
+  - train: baseline
   - _self_
 
 name: ???      # set by launcher; must appear as `name` in EXPERIMENT_LOG.md

@@ -1,4 +1,4 @@
-"""Training loop. YOURS: make_optimizer, update (pure torch; defaults below are a plain BC step).
+"""Baseline training loop. YOURS: make_optimizer, update (pure torch; defaults below are a plain BC step).
 The rest is scaffolding: protocol logging, test loss, eval schedule, atomic checkpoint + resume (tests/test_train.py)."""
 from pathlib import Path
 
