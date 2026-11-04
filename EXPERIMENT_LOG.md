@@ -21,3 +21,6 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-04, 17:20 EST `octo-smoke`: Octo-small random weights port baseline; prepare the model and the training loop / setup given from the OpenVLA paper
     - Changes: set up Octo on PyTorch
     - Expected: roughly on policy with the Octo paper
+- 2026-11-04, 17:44 EST `octo-small-50k`: Octo-small training baseline
+    - Changes: N/A
+    - Expected: 
