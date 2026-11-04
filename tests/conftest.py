@@ -110,4 +110,4 @@ def wandb_mock(monkeypatch):
 
 def logged(wandb_mock):
     """All wandb.log calls as [(metrics, step)]."""
-    return [(c.args[0], c.kwargs["step"]) for c in wandb_mock.log.call_args_list]
+    return [({k: v for k, v in c.args[0].items() if k != "step"}, c.args[0]["step"]) for c in wandb_mock.log.call_args_list]
