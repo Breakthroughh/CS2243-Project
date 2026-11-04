@@ -1,10 +1,10 @@
-"""Contract for src/dit.py. Dims: B batch, O obs horizon, P action horizon, V views, H height, W width, C rgb,
+"""Contract for src/policies/dit.py. Dims: B batch, O obs horizon, P action horizon, V views, H height, W width, C rgb,
 S state (8), A action (7)."""
 import torch
 from hydra.utils import instantiate
 
-from src.dit import DiTPolicy
-from src.policy import Policy
+from src.policies.dit import DiTPolicy
+from src.policies.baseline import Policy
 from src.run import compose
 
 TINY = dict(action_horizon=4, obs_horizon=2, d_model=32, n_layers=2, n_heads=2, n_train_steps=10,

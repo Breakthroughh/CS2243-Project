@@ -1,4 +1,4 @@
-_target_: src.dit.DiTPolicy
+_target_: src.policies.dit.DiTPolicy
 action_horizon: ${data.action_horizon}
 obs_horizon: ${data.obs_horizon}
 d_model: 256

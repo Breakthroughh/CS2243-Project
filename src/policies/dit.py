@@ -10,7 +10,7 @@ from einops import rearrange
 from torch import nn
 from transformers import CLIPTextModel, CLIPTokenizer
 
-from src.policy import Policy
+from src.policies.baseline import Policy
 
 IMAGENET_MEAN = torch.tensor([0.485, 0.456, 0.406])
 IMAGENET_STD = torch.tensor([0.229, 0.224, 0.225])
