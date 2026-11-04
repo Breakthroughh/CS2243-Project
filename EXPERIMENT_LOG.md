@@ -15,7 +15,7 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-03: `dit-pilot`
     - Changes: running a test first one
     - Expected: i expect it to be ok
-    - Results: 
+    - Results: its ass
     - running da pilot fr
     - Results: yay
 - 2026-11-03, 15:01 EST `baseline`: baseline standard policy from a pretrained model as well as training infrastructure to define a baseline

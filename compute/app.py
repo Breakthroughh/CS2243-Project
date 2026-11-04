@@ -56,7 +56,7 @@ def tasks(suite: str):
 
 @app.function(image=image, gpu="L4", cpu=4, memory=16384, volumes={"/results": volume},
               secrets=[modal.Secret.from_name("wandb"), modal.Secret.from_name("huggingface")],
-              timeout=7200, max_containers=4)  # 2 h for pilots; set from pilot measurements
+              timeout=57600, max_containers=4)  # 16 h: 50k DiT steps (~7 h) + evals (~38 s/episode); dit-pilot
 def run(cfg: dict):
     check_environment()
     from importlib.metadata import distributions
