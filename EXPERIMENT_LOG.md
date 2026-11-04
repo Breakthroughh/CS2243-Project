@@ -22,3 +22,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: add new diffusion policy as a subclass + training loop to train; set up task split 
     - Expected: 
     - Results: 
+- 2026-11-03, 8:49pm `baseline-dit`: longer dit
+    - Changes: increase training length 
+    - Expected: idk
+    - Results: 
+        
