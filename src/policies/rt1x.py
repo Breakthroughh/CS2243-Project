@@ -214,4 +214,5 @@ class RT1XPolicy(Policy):
 
     @torch.no_grad()
     def predict_action(self, obs):
-        return detokenize(self.action_logits(obs)[:, -1].argmax(-1))[:, None]
+        # rt-1 bounds exceed libero's after rescaling (world 2 / 1.75, rotation (pi / 2) / 1.4): clip to the libero space
+        return detokenize(self.action_logits(obs)[:, -1].argmax(-1))[:, None].clamp(-1, 1)

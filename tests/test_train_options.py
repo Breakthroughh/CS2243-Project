@@ -59,3 +59,14 @@ def test_octo_train_config():
     assert (t.lr, t.warmup_steps, t.schedule, t.max_steps, t.batch_size, t.weight_decay, t.grad_clip) == \
         (3e-4, 2000, "cosine", 50_000, 256, 0.01, 1.0)
     assert t.loop == "src.training.baseline.train"
+
+
+def test_resume_past_max_steps_does_not_train(cfg, libero_root, wandb_mock):
+    # relaunching a finished run (same name -> resume from latest.pt) must not train past max_steps
+    from src.logger import Logger
+    Path(cfg.run_dir).mkdir(parents=True)
+    cfg.train.max_steps = 3
+    assert run(cfg, libero_root, Logger(cfg), epochs=1) == 3
+    wandb_mock.log.reset_mock()
+    assert run(cfg, libero_root, Logger(cfg), epochs=5) == 3
+    assert not any("train/loss" in m for m, _ in logged(wandb_mock))
