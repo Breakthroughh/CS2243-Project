@@ -2,7 +2,7 @@ from pathlib import Path
 
 from omegaconf import OmegaConf
 
-from src.policy import NoOpPolicy
+from src.policies.baseline import NoOpPolicy
 from src.run import main
 from tests.conftest import logged
 

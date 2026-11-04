@@ -17,3 +17,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Expected: i expect it to be ok
     - Results: 
     - running da pilot fr
+    - Results: yay
+- 2026-11-03, 15:01 EST `baseline`: baseline standard policy from a pretrained model as well as training infrastructure to define a baseline
+    - Changes: add new diffusion policy as a subclass + training loop to train; set up task split 
+    - Expected: 
+    - Results: 

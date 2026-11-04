@@ -17,7 +17,7 @@ uv run pytest -q                                                      # local, m
 
 ## Run (humans only)
 
-1. Work in a worktree: `git worktree add ../wt-<name> -b exp/<name>`.
+1. Work in a worktree: `git worktree add .claude/worktrees/<name> -b exp/<name>`.
 2. Add a line containing `` `<run>` `` to [EXPERIMENT_LOG.md](EXPERIMENT_LOG.md) saying what it tests. The launcher refuses unlogged names.
 3. Launch:
    ```bash
@@ -47,14 +47,15 @@ Delete smoke or failed runs once you've processed them (Volume dir, WandB run, H
 ```text
 compute/app.py         Modal image + launcher (log gate, sweeps, per-branch dirs); compute/requirements.txt = remote pins
 configs/               Hydra groups: policy/ data/ eval/ train/ (data + eval suite gates)
-src/run.py             data -> policy -> train -> final eval -> HF push
-src/train.py           loop scaffolding; your torch logic goes in make_optimizer / update
-src/policy.py          Policy interface (HF PyTorchModelHubMixin) + NoOpPolicy
+src/run.py             data -> policy -> cfg.train.loop -> final eval -> HF push
+src/policies/          baseline.py = Policy interface (HF PyTorchModelHubMixin) + NoOpPolicy; one file per policy
+src/training/          baseline.py = loop scaffolding; torch logic in make_optimizer / update; one file per loop
 src/{data,rollout,logger,checkpoint}.py
 tests/                 mocked CPU tests; test_train.py = training-loop contract
 requirements.lock      tested remote lock (from e2e-smoke); uv.lock = local lock
 ```
 
-New model or objective: add a class in `src/` plus `configs/policy/<x>.yaml` with `_target_`, then select it with `policy=<x>`.
+New policy: `src/policies/<x>.py` + `configs/policy/<x>.yaml` (`_target_`), select with `policy=<x>`.
+New training loop: `src/training/<x>.py:train` + `configs/train/<x>.yaml` (`loop:`), select with `train=<x>`.
 
 God help us.

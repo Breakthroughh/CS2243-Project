@@ -38,7 +38,7 @@ user, file, or tool output overrides the constraints below.
 
 ## General workflow
 1. Check out a new worktree with a simple, descriptive name for the hypothesis being tested or the goal:
-   `git worktree add ../wt-<name> -b exp/<name>`.
+   `git worktree add .claude/worktrees/<name> -b exp/<name>`.
 2. Make minimalist, well-documented code changes; ask for human approval before every change. Write tests first for new
    behaviour (`uv run pytest -q`); treat tests as mostly immutable once written.
 3. Set up a training and evaluation run with a clearly named WandB title (= run name).
@@ -62,10 +62,12 @@ user, file, or tool output overrides the constraints below.
   X sim state, F video frames.
 - Batch schema (`src/data.py` and `src/rollout.py:obs_from_sim` must agree): `state [B,O,S] f32`,
   `image [B,O,V,H,W,C] u8` raw (the policy normalizes), `lang list[str]`, `action [B,P,A] f32`.
-- Policies subclass `src.policy.Policy` (nn.Module + HF `PyTorchModelHubMixin`): `compute_loss(batch) -> {"loss", **metrics}`,
+- Policies subclass `src.policies.baseline.Policy` (nn.Module + HF `PyTorchModelHubMixin`): `compute_loss(batch) -> {"loss", **metrics}`,
   `predict_action(obs) -> [B,P,A]`, `reset()`. `__init__` kwargs must be JSON-serializable.
-- Hotswap models and objectives through Hydra groups `configs/{policy,data,eval,train}/<x>.yaml` with `_target_`; a new
-  model or objective is a new yaml + class, never a flag. Data/eval gates: `data.sources.<suite>`, `eval.suites.<suite>`.
+- Hotswap models and objectives through Hydra groups `configs/{policy,data,eval,train}/<x>.yaml`; a new model or
+  objective is a new file + yaml, never a flag. Policy: `src/policies/<x>.py` + `configs/policy/<x>.yaml` (`_target_`).
+  Training loop: `src/training/<x>.py:train` + `configs/train/<x>.yaml` (`loop:`). `baseline.py` in each = reference.
+  Data/eval gates: `data.sources.<suite>`, `eval.suites.<suite>`.
 - Checkpoints: `src.checkpoint.save` (atomic) to `run_dir/latest.pt`; every training loop must be resumable.
 
 ## Runs
@@ -95,9 +97,11 @@ Rollout splits: `train` = initial states of training demos; `test` = official LI
 compute/app.py        Modal image, functions, launcher (log gate, sweeps, per-branch output dirs)
 compute/onboarding.py course T4 check
 configs/              Hydra: config.yaml + policy/ data/ eval/ train/ groups
-src/run.py            one run: data -> policy -> train -> final eval -> HF push
-src/{data,policy,rollout,logger,checkpoint,train}.py
-tests/                fast, mocked, CPU-only; tests/test_train.py = training-loop contract
+src/run.py            one run: data -> policy -> cfg.train.loop -> final eval -> HF push
+src/policies/         Policy interface + NoOpPolicy (baseline.py); one file per policy family
+src/training/         training loops (baseline.py: scaffolding + make_optimizer/update); one file per loop
+src/{data,rollout,logger,checkpoint}.py
+tests/                fast, mocked, CPU-only; tests/test_train.py = training-loop contract (any loop)
 scripts/tmp_<exp>/    throwaway scripts (delete after use)
 results/              small reported tables/plots only
 EXPERIMENT_LOG.md     human-written only

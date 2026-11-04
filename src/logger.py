@@ -16,6 +16,10 @@ class Logger:
         wandb.init(project=cfg.wandb.project, entity=cfg.wandb.entity, mode=cfg.wandb.mode, name=cfg.name,
                    group=cfg.git.branch, id=re.sub(r"[^\w-]", "-", f"{cfg.git.branch}-{cfg.name}"), resume="allow",
                    dir=cfg.run_dir, config=OmegaConf.to_container(cfg, resolve=True))
+        # step is a logged axis, not wandb's internal step, which rejects steps below its value on resume
+        wandb.define_metric("step")
+        for prefix in ("train", "test"):
+            wandb.define_metric(f"{prefix}/*", step_metric="step")
 
     def log(self, metrics, step):
         bad = [k for k in metrics if k.split("/")[0] not in ("train", "test")]
@@ -30,7 +34,7 @@ class Logger:
                 out[k] = wandb.Video(str(path))
             else:
                 out[k] = float(v)
-        wandb.log(out, step=step)
+        wandb.log({"step": step, **out})
         with open(self.dir / "metrics.jsonl", "a") as f:
             f.write(json.dumps({"step": step, **{k: v for k, v in out.items() if isinstance(v, float)}}) + "\n")
 

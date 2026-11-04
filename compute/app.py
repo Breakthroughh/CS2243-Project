@@ -64,7 +64,10 @@ def run(cfg: dict):
     from src.run import main as run_main
     run_dir = Path(cfg["run_dir"])
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "freeze.txt").write_text("\n".join(sorted(f"{d.metadata['Name']}=={d.version}" for d in distributions())))
+    pins = {}
+    for d in distributions():  # sys.path order: first hit per name is the one imported (image has 2 site-packages)
+        pins.setdefault(d.metadata["Name"].lower().replace("_", "-"), f"{d.metadata['Name']}=={d.version}")
+    (run_dir / "freeze.txt").write_text("\n".join(sorted(pins.values())))
     try:
         run_main(OmegaConf.create(cfg))
     finally:
@@ -90,5 +93,7 @@ def main(name: str, overrides: str = ""):
         cfg.name, cfg.run_dir = run_name, f"/results/runs/{branch}/{run_name}"
         cfg.git.branch, cfg.git.commit, cfg.git.dirty = branch, commit, dirty
         cfgs.append(OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True))
-    for _ in run.map(cfgs):
-        pass
+    # .spawn, not .map: map inputs are cancelled if this client dies; spawned calls survive it under --detach
+    calls = [run.spawn(cfg) for cfg in cfgs]
+    print("Spawned:", *(f"{c['name']}: {call.object_id}" for c, call in zip(cfgs, calls)), sep="\n  ")
+    modal.FunctionCall.gather(*calls)

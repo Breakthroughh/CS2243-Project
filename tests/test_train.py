@@ -1,4 +1,4 @@
-"""Contract for the training loop in src/train.py.
+"""Contract for the training loop in src/training/baseline.py.
 Dims: B batch, P action horizon, S state (8), A action (7)."""
 from pathlib import Path
 
@@ -7,8 +7,8 @@ import torch
 import torch.nn.functional as F
 
 from src.data import build_datasets
-from src.policy import Policy
-from src.train import train
+from src.policies.baseline import Policy
+from src.training.baseline import train
 from tests.conftest import logged
 
 class Linear(Policy):
