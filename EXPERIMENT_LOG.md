@@ -24,6 +24,6 @@ Failed arms: branch, code changes, why it failed. -->
     - Results: 
 - 2026-11-03, 8:49pm `baseline-dit`: longer dit
     - Changes: increase training length 
-    - Expected: idk
+    - Expected: 50% success on libero
     - Results: 
         
