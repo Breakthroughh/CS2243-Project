@@ -1,0 +1,11 @@
+# @package _global_
+# Octo-Small 1.5 (27M), inputs per octo finetune_config.py: window 1, action chunk 4.
+policy:
+  _target_: src.policies.octo.OctoPolicy
+  size: small
+  action_horizon: ${data.action_horizon}
+data:
+  obs_horizon: 1
+  action_horizon: 4
+eval:
+  n_action_steps: 4

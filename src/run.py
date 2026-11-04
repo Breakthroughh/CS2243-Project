@@ -10,7 +10,7 @@ from hydra.utils import get_method, instantiate
 from omegaconf import OmegaConf
 
 from src.config import compose  # noqa: F401
-from src.data import build_datasets, resolve_root
+from src.data import action_stats, build_datasets, resolve_root
 from src.logger import Logger
 from src.rollout import evaluate
 
@@ -22,7 +22,9 @@ def main(cfg):
     random.seed(cfg.seed), np.random.seed(cfg.seed), torch.manual_seed(cfg.seed)
     root = resolve_root(cfg)
     train_set, test_set = build_datasets(cfg, root)
-    policy = instantiate(cfg.policy).to(cfg.device)
+    policy = instantiate(cfg.policy)
+    policy.set_action_stats(*(torch.as_tensor(x, dtype=torch.float32) for x in action_stats(train_set)))
+    policy = policy.to(cfg.device)
     logger = Logger(cfg)
     evaluate_fn = partial(evaluate, cfg=cfg, root=root)
     step = get_method(cfg.train.loop)(cfg, policy, train_set, test_set, logger, evaluate_fn)

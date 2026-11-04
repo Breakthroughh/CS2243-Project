@@ -1,8 +1,8 @@
 defaults:
-  - policy: noop
   - data: libero
   - eval: libero
   - train: baseline
+  - policy: noop   # after data/eval: policy files with `# @package _global_` may override their settings
   - _self_
 
 name: ???      # set by launcher; must appear as `name` in EXPERIMENT_LOG.md

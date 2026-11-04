@@ -26,11 +26,11 @@ def window(ds, t_K):
 
 
 class LiberoTask(Dataset):
-    """One task file. Sample at demo step t: obs window ends at t (first obs repeated), action window starts at t
-    (last action repeated). -> state [O, S] f32, image [O, V, H, W, C] u8, action [P, A] f32, lang str."""
+    """One task file. Sample at demo step t: obs window ends at t (first obs repeated), action window starts at
+    t - action_offset (clamped to the demo). -> state [O, S] f32, image [O, V, H, W, C] u8, action [P, A] f32, lang str."""
 
-    def __init__(self, path, demos, obs_horizon, action_horizon):
-        self.path, self.O, self.P = path, obs_horizon, action_horizon
+    def __init__(self, path, demos, obs_horizon, action_horizon, action_offset=0):
+        self.path, self.O, self.P, self.offset = path, obs_horizon, action_horizon, action_offset
         with h5py.File(path) as f:
             self.lang = json.loads(f["data"].attrs["problem_info"])["language_instruction"]
             self.index = [(d, t, n) for d in demos for n in [len(f[f"data/{d}/actions"])] for t in range(n)]
@@ -41,7 +41,7 @@ class LiberoTask(Dataset):
     def __getitem__(self, i):
         d, t, n = self.index[i]
         obs_t_O = np.clip(np.arange(t - self.O + 1, t + 1), 0, None)
-        act_t_P = np.clip(np.arange(t, t + self.P), None, n - 1)
+        act_t_P = np.clip(np.arange(t - self.offset, t - self.offset + self.P), 0, n - 1)
         with h5py.File(self.path) as f:  # opened per item: h5py handles don't survive DataLoader workers
             g = f[f"data/{d}"]
             state_OS = np.concatenate([window(g["obs/ee_states"], obs_t_O), window(g["obs/gripper_states"], obs_t_O)], -1) # robot state
@@ -59,6 +59,17 @@ def build_datasets(cfg, root):
             with h5py.File(path) as f:
                 demos = sorted(f["data"], key=lambda d: int(d.split("_")[1]))
             split = len(demos) - math.ceil(cfg.data.val_ratio * len(demos))
-            train.append(LiberoTask(path, demos[:split], cfg.data.obs_horizon, cfg.data.action_horizon))
-            test.append(LiberoTask(path, demos[split:], cfg.data.obs_horizon, cfg.data.action_horizon))
+            horizons = cfg.data.obs_horizon, cfg.data.action_horizon, cfg.data.action_offset
+            train.append(LiberoTask(path, demos[:split], *horizons))
+            test.append(LiberoTask(path, demos[split:], *horizons))
     return ConcatDataset(train), ConcatDataset(test)
+
+
+def action_stats(dataset):
+    """Per-dim mean, std [A] over every action of the dataset's demos."""
+    actions_NA = []
+    for task in dataset.datasets:
+        with h5py.File(task.path) as f:
+            actions_NA += [f[f"data/{d}/actions"][:] for d in dict.fromkeys(d for d, _, _ in task.index)]
+    actions_NA = np.concatenate(actions_NA)
+    return actions_NA.mean(0), actions_NA.std(0)

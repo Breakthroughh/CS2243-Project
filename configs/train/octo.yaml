@@ -1,0 +1,15 @@
+# Octo finetune recipe (octo scripts/configs/finetune_config.py): AdamW, 0 -> 3e-4 over 2k steps, cosine to 0 at 50k,
+# weight decay 0.01, grad clip 1.0, batch 256.
+defaults:
+  - baseline
+  - _self_
+
+lr: 3.0e-4
+weight_decay: 0.01
+schedule: cosine
+warmup_steps: 2000
+max_steps: 50000
+batch_size: 256
+grad_clip: 1.0
+epochs: 1000      # step-bound: training stops at max_steps
+eval_every: 25    # epochs (~5k steps on LIBERO-Spatial at batch 256, octo's eval interval)

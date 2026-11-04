@@ -2,7 +2,7 @@
 S state (8), A action (7)."""
 import numpy as np
 
-from src.data import build_datasets, resolve_root
+from src.data import action_stats, build_datasets, resolve_root
 
 
 def test_sizes_and_val_split_use_last_demos(cfg, libero_root):
@@ -36,3 +36,16 @@ def test_download_when_no_root(cfg, libero_root, monkeypatch):
     cfg.data.root = None
     assert resolve_root(cfg) == libero_root
     assert "libero_spatial/*" in calls[0]["allow_patterns"]
+
+def test_action_offset_aligns_actions_with_obs_window(cfg, libero_root):
+    cfg.data.action_offset = 1
+    train, _ = build_datasets(cfg, libero_root)
+    assert (train[0]["action"][:, 0] == [0, 0, 1, 2]).all()  # window starts before t=0: clamped to first action
+    assert (train[5]["action"][:, 0] == [4, 5, 6, 7]).all()
+
+
+def test_action_stats_over_train_demos(cfg, libero_root):
+    train, _ = build_datasets(cfg, libero_root)
+    mean_A, std_A = action_stats(train)
+    assert mean_A.shape == (7,) and np.allclose(mean_A, 104.5)  # train demos 0..2: actions 100 * demo + t
+    assert (std_A > 0).all()

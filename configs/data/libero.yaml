@@ -3,6 +3,7 @@ root: null                              # local dir with <suite>/*.hdf5; null ->
 download_dir: /results/datasets/LIBERO  # on the Volume: downloaded once, shared by all runs
 obs_horizon: 2
 action_horizon: 16
+action_offset: 0                        # action window starts at t - action_offset (RT-1: labels for every obs step)
 val_ratio: 0.1                          # last demos of each task -> test/loss
 sources:                                # gates
   libero_spatial: true

@@ -12,7 +12,12 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: set up infra
     - Expected: this shit works
     - Results: yay
-- 2026-11-03, 15:01 EST `baseline`: baseline standard policy from a pretrained model as well as training infrastructure to define a baseline
-    - Changes: add new diffusion policy as a subclass + training loop to train; set up task split 
-    - Expected: 
+
+## vla-baselines
+- 2026-11-03, 15:01 EST `baseline`: baseline standard policy from a pretrained VLA-style model as well as training infrastructure to define a baseline
+    - Changes: add new Torch implementations of accepted architectures (Octo 27/93M + RT-1-X 35M) that are generalist robot policies with transformer backbones as well as training loop based on the dit-baseline similar training loop; train on the same LIBERO-Spatial initial task set with IDENTICAL training settings to attempt to reproduce, within noise, the performance of these policies on tasks as reported by their original papers
+    - Expected: slightly different results but within noise of the original papers' performances; baselines should also operate within noise of the diffusion policy-style baselines that we established in WandB and on the other branch (roughly 73% performance at 50k steps final eval)
     - Results: 
+- 2026-11-04, 17:20 EST `octo-smoke`: Octo-small random weights port baseline; prepare the model and the training loop / setup given from the OpenVLA paper
+    - Changes: set up Octo on PyTorch
+    - Expected: roughly on policy with the Octo paper

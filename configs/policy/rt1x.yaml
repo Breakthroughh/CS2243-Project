@@ -1,0 +1,12 @@
+# @package _global_
+# RT-1-X (released OXE JAX config, ~55M): 15-frame window, one action predicted per step, loss on every step.
+policy:
+  _target_: src.policies.rt1x.RT1XPolicy
+  obs_horizon: ${data.obs_horizon}
+  pretrained: true   # ImageNet EfficientNet-B3
+data:
+  obs_horizon: 15
+  action_horizon: 15
+  action_offset: 14   # action labels aligned with the obs window
+eval:
+  n_action_steps: 1

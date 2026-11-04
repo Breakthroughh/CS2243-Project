@@ -1,0 +1,12 @@
+# @package _global_
+# Octo-Base 1.5 initialised from the official checkpoint (converted by scripts/convert_octo.py; parity-checked),
+# inputs per octo finetune_config.py: window 1, action chunk 4.
+policy:
+  _target_: src.policies.octo.OctoPolicy.from_pretrained
+  pretrained_model_name_or_path: jackfanml/octo-base-1.5-torch
+  action_horizon: ${data.action_horizon}
+data:
+  obs_horizon: 1
+  action_horizon: 4
+eval:
+  n_action_steps: 4

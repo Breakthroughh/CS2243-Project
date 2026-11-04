@@ -29,7 +29,9 @@ image = (
           "NVIDIA_DRIVER_CAPABILITIES": "compute,utility,graphics",
           "LIBERO_CONFIG_PATH": "/root/.libero", "PYTHONPATH": "/root:/opt/LIBERO",
           "CS2243_PROJECT_ENV": PROJECT, "CS2243_VOLUME_NAME": VOLUME_NAME,
-          "CS2243_PURPOSE": PURPOSE})  # module is re-imported in the container
+          "CS2243_PURPOSE": PURPOSE,  # module is re-imported in the container
+          # model downloads (t5-base, MiniLM, converted policies, ImageNet weights) cached once on the Volume
+          "HF_HOME": "/results/cache/huggingface", "TORCH_HOME": "/results/cache/torch"})
     .add_local_dir(ROOT / "src", "/root/src", ignore=["**/__pycache__"])
 )
 
