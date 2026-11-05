@@ -96,9 +96,7 @@ def main(name: str, overrides: str = ""):
         cfg.name, cfg.run_dir = run_name, f"/results/runs/{branch}/{run_name}"
         cfg.git.branch, cfg.git.commit, cfg.git.dirty = branch, commit, dirty
         cfgs.append(OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True))
-    # spawn, not map: with --detach, spawned calls keep running after this client exits (map inputs get cancelled)
+    # .spawn, not .map: map inputs are cancelled if this client dies; spawned calls survive it under --detach
     calls = [run.spawn(cfg) for cfg in cfgs]
-    for cfg, call in zip(cfgs, calls):
-        print(f"{cfg['name']}: {call.object_id}")
-    for call in calls:
-        call.get()
+    print("Spawned:", *(f"{c['name']}: {call.object_id}" for c, call in zip(cfgs, calls)), sep="\n  ")
+    modal.FunctionCall.gather(*calls)

@@ -41,7 +41,7 @@ def app(load, monkeypatch, tmp_path):
 
 
 def launched(app):
-    # spawn, not map: spawned calls on a detached app survive the local client exiting (map inputs get cancelled)
+    app.run.map.assert_not_called()  # .map inputs are cancelled when the local client dies; .spawn calls survive --detach
     return [c.args[0] for c in app.run.spawn.call_args_list]
 
 
