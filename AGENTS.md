@@ -71,7 +71,8 @@ user, file, or tool output overrides the constraints below.
 - Checkpoints: `src.checkpoint.save` (atomic) to `run_dir/latest.pt`; every training loop must be resumable.
 
 ## Runs
-- Launch (human only): `modal run --env=$CS2243_PROJECT_ENV compute/app.py --name <run> --overrides "policy=x train.lr=1e-3,1e-4"`.
+- Launch (human only): `modal run --detach --env=$CS2243_PROJECT_ENV compute/app.py --name <run> --overrides "policy=x train.lr=1e-3,1e-4"`.
+  `--detach` + `run.spawn`: runs survive closing the terminal. Relaunching a name resumes it (and stops at `train.max_steps`).
   Comma values expand into a sweep (one container each, ≤ 4 concurrent); each swept config gets the suffix `<run>_<key>=<val>`.
 - Output dir `/results/runs/<branch>/<run>/` holds `config.yaml`, `freeze.txt`, `metrics.jsonl`, `latest.pt`, `videos/`.
   Reusing a name resumes that run; a new experiment needs a new name. Datasets are cached once in `/results/datasets/`.

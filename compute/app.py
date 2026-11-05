@@ -1,5 +1,6 @@
-"""Modal launcher. Humans only: `modal run --env=$CS2243_PROJECT_ENV compute/app.py --name <run> --overrides "..."`.
-Comma-separated override values (`train.lr=1e-3,1e-4`) expand into a sweep; one container per config."""
+"""Modal launcher. Humans only: `modal run --detach --env=$CS2243_PROJECT_ENV compute/app.py --name <run> --overrides "..."`.
+Comma-separated override values (`train.lr=1e-3,1e-4`) expand into a sweep; one container per config.
+With --detach the runs survive closing the terminal; track with `modal app logs <app id>` / WandB."""
 from pathlib import Path
 import itertools
 import os
@@ -95,5 +96,9 @@ def main(name: str, overrides: str = ""):
         cfg.name, cfg.run_dir = run_name, f"/results/runs/{branch}/{run_name}"
         cfg.git.branch, cfg.git.commit, cfg.git.dirty = branch, commit, dirty
         cfgs.append(OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True))
-    for _ in run.map(cfgs):
-        pass
+    # spawn, not map: with --detach, spawned calls keep running after this client exits (map inputs get cancelled)
+    calls = [run.spawn(cfg) for cfg in cfgs]
+    for cfg, call in zip(cfgs, calls):
+        print(f"{cfg['name']}: {call.object_id}")
+    for call in calls:
+        call.get()

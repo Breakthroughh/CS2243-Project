@@ -41,7 +41,8 @@ def app(load, monkeypatch, tmp_path):
 
 
 def launched(app):
-    return list(app.run.map.call_args.args[0])
+    # spawn, not map: spawned calls on a detached app survive the local client exiting (map inputs get cancelled)
+    return [c.args[0] for c in app.run.spawn.call_args_list]
 
 
 def test_uses_staff_volume(load):
@@ -76,7 +77,7 @@ def test_function_limits_and_gpus(filename):
 def test_launch_requires_log_entry(app):
     with pytest.raises(SystemExit, match="EXPERIMENT_LOG.md"):
         app.main(name="unlogged")
-    app.run.map.assert_not_called()
+    app.run.spawn.assert_not_called()
 
 
 def test_launch_config_and_output_dir(app):
