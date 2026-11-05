@@ -60,17 +60,21 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
         optimizer.load_state_dict(state["optimizer"])
         scheduler.load_state_dict(state["scheduler"])
         start_epoch, step = state["epoch"], state["step"]
+        if "rng" in state:  # absent in checkpoints written before RNG state was saved
+            checkpoint.set_rng_state(state["rng"])
 
     micro = cfg.train.micro_batch_size or cfg.train.batch_size
     assert cfg.train.batch_size % micro == 0, "batch_size must be a multiple of micro_batch_size"
     accum = cfg.train.batch_size // micro
-    loader = DataLoader(train_set, micro, shuffle=True, drop_last=True, num_workers=cfg.train.num_workers)
+    order = torch.Generator()  # data order seeded per epoch: a resumed epoch replays exactly the same batches
+    loader = DataLoader(train_set, micro, shuffle=True, drop_last=True, num_workers=cfg.train.num_workers, generator=order)
     test_loader = DataLoader(test_set, micro, num_workers=cfg.train.num_workers)
 
     done = lambda: cfg.train.max_steps is not None and step >= cfg.train.max_steps  # >=: resumed runs may already be past it
     for epoch in range(start_epoch, cfg.train.epochs):
         if done():
             break
+        order.manual_seed(cfg.seed + epoch)
         policy.train()
         batches = []
         for batch in loader:
@@ -94,7 +98,7 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
         if (epoch + 1) % cfg.train.eval_every == 0:
             logger.log(evaluate(policy), step)
         checkpoint.save(path, policy=policy.state_dict(), optimizer=optimizer.state_dict(), scheduler=scheduler.state_dict(),
-                        epoch=epoch + 1, step=step)
+                        epoch=epoch + 1, step=step, rng=checkpoint.rng_state())
         if done():
             break
     return step

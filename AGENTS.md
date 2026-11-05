@@ -68,7 +68,9 @@ user, file, or tool output overrides the constraints below.
   objective is a new file + yaml, never a flag. Policy: `src/policies/<x>.py` + `configs/policy/<x>.yaml` (`_target_`).
   Training loop: `src/training/<x>.py:train` + `configs/train/<x>.yaml` (`loop:`). `baseline.py` in each = reference.
   Data/eval gates: `data.sources.<suite>`, `eval.suites.<suite>`.
-- Checkpoints: `src.checkpoint.save` (atomic) to `run_dir/latest.pt`; every training loop must be resumable.
+- Checkpoints: `src.checkpoint.save` (atomic) to `run_dir/latest.pt` every epoch: weights, optimizer, scheduler, epoch/step
+  and RNG state, committed to the Volume on each save. Data order is seeded per epoch, so resume is exact and idempotent.
+  Every training loop must be resumable.
 
 ## Runs
 - Launch (human only): `modal run --detach --env=$CS2243_PROJECT_ENV compute/app.py --name <run> --overrides "policy=x train.lr=1e-3,1e-4"`.
@@ -76,6 +78,8 @@ user, file, or tool output overrides the constraints below.
   Comma values expand into a sweep (one container each, ≤ 4 concurrent); each swept config gets the suffix `<run>_<key>=<val>`.
 - Output dir `/results/runs/<branch>/<run>/` holds `config.yaml`, `freeze.txt`, `metrics.jsonl`, `latest.pt`, `videos/`.
   Reusing a name resumes that run; a new experiment needs a new name. Datasets are cached once in `/results/datasets/`.
+  Never delete a WandB run you may relaunch: WandB permanently burns a deleted run's id (= `<branch>-<run>`), so the
+  name can never be reused. To retry a failed run, relaunch the same name (resumes) or use a new name.
 - WandB: project `cs2243-diffusion-policy`, group = branch, name = run. `hf.namespace=<user>` pushes the final policy
   to the private repo `<user>/<branch>-<run>`.
 - List tasks: `modal run --env=$CS2243_PROJECT_ENV compute/app.py::tasks --suite libero_goal`.

@@ -93,3 +93,12 @@ def test_sweep_expands_and_separates(app):
     cfgs = launched(app)
     assert [c["train"]["lr"] for c in cfgs] == [0.001, 0.0001]
     assert len({c["run_dir"] for c in cfgs}) == 2 and all(c["name"].startswith("base") for c in cfgs)
+
+
+def test_run_commits_volume_after_every_checkpoint(load, monkeypatch, tmp_path):
+    app = load()
+    from src import checkpoint
+    monkeypatch.setattr(checkpoint, "on_save", [])
+    monkeypatch.setattr("src.run.main", lambda cfg: [checkpoint.save(tmp_path / "latest.pt", step=s) for s in range(3)])
+    app.run({"run_dir": str(tmp_path)})
+    assert app.volume.commit.call_count == 3 + 1  # every checkpoint, plus the final commit

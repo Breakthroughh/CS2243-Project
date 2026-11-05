@@ -64,7 +64,10 @@ def run(cfg: dict):
     check_environment()
     from importlib.metadata import distributions
     from omegaconf import OmegaConf
+    from src import checkpoint
     from src.run import main as run_main
+    if volume.commit not in checkpoint.on_save:  # containers may be reused across calls
+        checkpoint.on_save.append(volume.commit)  # persist every checkpoint: Volumes only auto-commit on graceful exit
     run_dir = Path(cfg["run_dir"])
     run_dir.mkdir(parents=True, exist_ok=True)
     pins = {}

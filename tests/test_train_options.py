@@ -95,3 +95,40 @@ def test_micro_batches_keep_steps_per_epoch(cfg, libero_root, wandb_mock, tmp_pa
     cfg.run_dir, cfg.train.micro_batch_size = str(tmp_path / "micro"), cfg.train.batch_size // 2
     Path(cfg.run_dir).mkdir(parents=True)
     assert run(cfg, libero_root, Logger(cfg), epochs=1) == full
+
+
+class Noisy(Policy):
+    """Loss depends on data order and on the torch RNG, so exact resume needs both restored."""
+
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Linear(8, 7)
+
+    def compute_loss(self, batch):
+        state_BS = batch["state"][:, -1] + 0.1 * torch.randn_like(batch["state"][:, -1])
+        return {"loss": nn.functional.mse_loss(self.net(state_BS), batch["action"][:, 0])}
+
+
+def test_resumed_run_matches_uninterrupted(cfg, libero_root, wandb_mock, tmp_path):
+    from src.data import build_datasets
+    from src.logger import Logger
+    from src.training.baseline import train
+    train_set, test_set = build_datasets(cfg, libero_root)
+
+    def go(run_dir, epochs):
+        cfg.run_dir, cfg.train.epochs = str(run_dir), epochs
+        Path(run_dir).mkdir(exist_ok=True)
+        torch.manual_seed(0)
+        policy = Noisy()
+        train(cfg, policy, train_set, test_set, Logger(cfg), evaluate=lambda p: {})
+        return policy
+
+    full = go(tmp_path / "full", 3)
+    losses_full = [m["train/loss"] for m, _ in logged(wandb_mock) if "train/loss" in m]
+    wandb_mock.log.reset_mock()
+    go(tmp_path / "resumed", 1)  # interrupted after epoch 1
+    torch.manual_seed(123)       # a resumed process starts from a different RNG state
+    resumed = go(tmp_path / "resumed", 3)
+    losses_resumed = [m["train/loss"] for m, _ in logged(wandb_mock) if "train/loss" in m]
+    assert losses_resumed == losses_full
+    assert all(torch.equal(a, b) for a, b in zip(full.state_dict().values(), resumed.state_dict().values()))
