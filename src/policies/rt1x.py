@@ -195,6 +195,11 @@ class RT1XPolicy(Policy):
         B, O = x_BOCHW.shape[:2]
         ctx = repeat(ctx_BE, "b e -> (b o) e", o=O)
         image_BOID = rearrange(self.tokenizer(rearrange(x_BOCHW, "b o c h w -> (b o) c h w"), ctx), "(b o) i d -> b o i d", b=B)
+        return self.transformer_logits(image_BOID)
+
+    def transformer_logits(self, image_BOID):
+        """image tokens [B, O, I, D] (+ zero action tokens) -> logits [B, N, U]."""
+        B, O = image_BOID.shape[:2]
         tokens_BOND = torch.cat([image_BOID, image_BOID.new_zeros(B, O, K, D)], 2)
         x_BND = self.inp(rearrange(tokens_BOND, "b o n d -> b (o n) d")) + self.pos.weight.T + self.pos.bias
         allow_NN = attention_mask(I, K, O).to(x_BND.device)

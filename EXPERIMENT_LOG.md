@@ -21,6 +21,12 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-04, 17:20 EST `octo-smoke`: Octo-small random weights port baseline; prepare the model and the training loop / setup given from the OpenVLA paper
     - Changes: set up Octo on PyTorch
     - Expected: roughly on policy with the Octo paper
+    - Results: fair play
 - 2026-11-04, 17:44 EST `octo-small-50k-b64`: Octo-small training baseline
     - Changes: N/A
-    - Expected: 
+    - Expected: as above
+    - Results: 
+- 2026-11-04, 17:44 EST `rt1x-smoke`: RT-1-X smoke
+    - Changes: ported RT-1-X JAX model to Torch and parity tested at both fp64 and fp32; NOTE: ood inputs will cause spikes that, because of noise, can generate high error values
+    - Expected: trainable model and reasonable model behaviour
+    - Results: 
