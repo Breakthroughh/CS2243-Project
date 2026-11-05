@@ -29,4 +29,8 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-04, 17:44 EST `rt1x-smoke`: RT-1-X smoke
     - Changes: ported RT-1-X JAX model to Torch and parity tested at both fp64 and fp32; NOTE: ood inputs will cause spikes that, because of noise, can generate high error values
     - Expected: trainable model and reasonable model behaviour
+    - Results: yes
+- 2026-11-05, 00:43 EST `rt1x-1f-50k-b64`: RT1X training baseline
+    - Changes: RT-1-X set up, baseline run
+    - Expected: as above
     - Results: 
