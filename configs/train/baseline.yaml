@@ -2,6 +2,7 @@ loop: src.training.baseline.train   # hotswap: path to any train(cfg, policy, tr
 epochs: 0         # 0 = eval only (no-op baseline)
 max_steps: null   # cap on total optimizer steps (smoke/pilot runs)
 batch_size: 64
+micro_batch_size: null  # gradient accumulation: batch_size / micro_batch_size micro-batches per step (null = batch_size)
 lr: 1.0e-4
 weight_decay: 0.01  # AdamW, weight matrices only
 schedule: constant # constant | cosine (to 0 at max_steps)

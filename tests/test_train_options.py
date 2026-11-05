@@ -70,3 +70,28 @@ def test_resume_past_max_steps_does_not_train(cfg, libero_root, wandb_mock):
     wandb_mock.log.reset_mock()
     assert run(cfg, libero_root, Logger(cfg), epochs=5) == 3
     assert not any("train/loss" in m for m, _ in logged(wandb_mock))
+
+
+def test_grad_accumulation_equals_full_batch_update(cfg):
+    from src.training.baseline import update
+    from tests.test_train import Linear
+    cfg.train.grad_clip = 1e9
+    torch.manual_seed(0)
+    full, accum = Linear(), Linear()
+    accum.load_state_dict(full.state_dict())
+    batch = {"state": torch.randn(4, 1, 8), "action": torch.randn(4, 1, 7)}
+    halves = [{k: v[:2] for k, v in batch.items()}, {k: v[2:] for k, v in batch.items()}]
+    out_full = update(cfg, full, torch.optim.SGD(full.parameters(), lr=0.1), [batch])
+    out_accum = update(cfg, accum, torch.optim.SGD(accum.parameters(), lr=0.1), halves)
+    assert torch.allclose(out_full["loss"], out_accum["loss"]) and torch.allclose(out_full["grad_norm"], out_accum["grad_norm"])
+    assert all(torch.allclose(a, b, atol=1e-6) for a, b in zip(full.parameters(), accum.parameters()))
+
+
+def test_micro_batches_keep_steps_per_epoch(cfg, libero_root, wandb_mock, tmp_path):
+    from src.logger import Logger
+    assert cfg.train.micro_batch_size is None  # default: no accumulation
+    Path(cfg.run_dir).mkdir(parents=True)
+    full = run(cfg, libero_root, Logger(cfg), epochs=1)
+    cfg.run_dir, cfg.train.micro_batch_size = str(tmp_path / "micro"), cfg.train.batch_size // 2
+    Path(cfg.run_dir).mkdir(parents=True)
+    assert run(cfg, libero_root, Logger(cfg), epochs=1) == full

@@ -30,11 +30,16 @@ def make_optimizer(cfg, policy):
     return optimizer, torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: lr_factor(cfg.train, step))
 
 
-def update(cfg, policy, optimizer, batch):
-    """One optimizer step -> {"loss", "grad_norm", **policy metrics} (scalars)."""
-    out = policy.compute_loss(batch)
+def update(cfg, policy, optimizer, batches):
+    """One optimizer step over equal-size micro-batches (gradient accumulation; 1 = plain step)
+    -> {"loss", "grad_norm", **policy metrics} (scalars, averaged over micro-batches)."""
     optimizer.zero_grad()
-    out["loss"].backward()
+    outs = []
+    for batch in batches:
+        out = policy.compute_loss(batch)
+        (out["loss"] / len(batches)).backward()
+        outs.append({k: v.detach() for k, v in out.items()})
+    out = {k: torch.stack([o[k] for o in outs]).mean() for k in outs[0]}
     out["grad_norm"] = torch.nn.utils.clip_grad_norm_(policy.parameters(), cfg.train.grad_clip)
     optimizer.step()
     return out
@@ -56,17 +61,25 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
         scheduler.load_state_dict(state["scheduler"])
         start_epoch, step = state["epoch"], state["step"]
 
-    loader = DataLoader(train_set, cfg.train.batch_size, shuffle=True, drop_last=True, num_workers=cfg.train.num_workers)
-    test_loader = DataLoader(test_set, cfg.train.batch_size, num_workers=cfg.train.num_workers)
+    micro = cfg.train.micro_batch_size or cfg.train.batch_size
+    assert cfg.train.batch_size % micro == 0, "batch_size must be a multiple of micro_batch_size"
+    accum = cfg.train.batch_size // micro
+    loader = DataLoader(train_set, micro, shuffle=True, drop_last=True, num_workers=cfg.train.num_workers)
+    test_loader = DataLoader(test_set, micro, num_workers=cfg.train.num_workers)
 
     done = lambda: cfg.train.max_steps is not None and step >= cfg.train.max_steps  # >=: resumed runs may already be past it
     for epoch in range(start_epoch, cfg.train.epochs):
         if done():
             break
         policy.train()
+        batches = []
         for batch in loader:
+            batches.append(to_device(batch, cfg.device))
+            if len(batches) < accum:
+                continue
             lr = optimizer.param_groups[0]["lr"]
-            out = update(cfg, policy, optimizer, to_device(batch, cfg.device))
+            out = update(cfg, policy, optimizer, batches)
+            batches = []
             scheduler.step()
             step += 1
             logger.log({**{f"train/{k}": v.item() for k, v in out.items()}, "train/lr": lr,
