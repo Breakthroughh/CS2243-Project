@@ -59,7 +59,7 @@ def tasks(suite: str):
 
 @app.function(image=image, gpu="L4", cpu=4, memory=16384, volumes={"/results": volume},
               secrets=[modal.Secret.from_name("wandb"), modal.Secret.from_name("huggingface")],
-              timeout=57600, max_containers=4)  # 16 h: 50k steps + 3 x 520-episode evals (dit baseline-dit: 16.2 h)
+              timeout=86400, max_containers=4)  # 24 h (course max): rt1x 50k steps ~14.4 h + 3 x 520-episode evals
 def run(cfg: dict):
     check_environment()
     from importlib.metadata import distributions
