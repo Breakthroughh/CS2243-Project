@@ -54,3 +54,9 @@ def test_hydra_config():
     cfg = compose(["policy=rt1x"])
     assert cfg.data.obs_horizon == 15 and cfg.data.action_horizon == 15 and cfg.data.action_offset == 14
     assert cfg.eval.n_action_steps == 1 and cfg.policy.obs_horizon == 15
+
+
+def test_hydra_config_1_frame():
+    cfg = compose(["policy=rt1x_1f"])
+    assert (cfg.data.obs_horizon, cfg.data.action_horizon, cfg.data.action_offset) == (1, 1, 0)
+    assert cfg.eval.n_action_steps == 1 and cfg.policy.obs_horizon == 1

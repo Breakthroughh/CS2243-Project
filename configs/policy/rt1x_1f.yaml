@@ -1,0 +1,13 @@
+# @package _global_
+# RT-1-X architecture (released OXE config) with 1 frame of context instead of 15, matching our Octo-small runs
+# (octo finetune config: window 1). One action predicted per step.
+policy:
+  _target_: src.policies.rt1x.RT1XPolicy
+  obs_horizon: ${data.obs_horizon}
+  pretrained: true   # ImageNet EfficientNet-B3
+data:
+  obs_horizon: 1
+  action_horizon: 1
+  action_offset: 0
+eval:
+  n_action_steps: 1
