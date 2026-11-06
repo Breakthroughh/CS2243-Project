@@ -1,5 +1,5 @@
 """Released RT-1-X flax params + batch_stats -> src.policies.rt1x.RT1XPolicy state_dict (lang_dim 512 = USE).
-Params come from scripts/tmp_vla-baselines/rt1x_ref.py (flattened '/'-joined npz, 'params/' and 'batch_stats/' roots).
+Params: flattened '/'-joined npz ('params/', 'batch_stats/' roots) dumped by git show c344c64:scripts/tmp_vla-baselines/rt1x_ref.py.
 usage: uv run python scripts/convert_rt1x.py <rt1x_params.npz> <out_dir>  (-> save_pretrained)"""
 import sys
 

@@ -1,5 +1,5 @@
 """Official Octo 1.5 flax params -> src.policies.octo.OctoPolicy state_dict (T5 excluded: loaded from HF t5-base).
-Params come from scripts/tmp_vla-baselines/octo_ref.py (flattened '/'-joined npz).
+Params: flattened '/'-joined npz dumped by the JAX reference script (git show c344c64:scripts/tmp_vla-baselines/octo_ref.py).
 usage: uv run python scripts/convert_octo.py <octo_{size}_params.npz> {small,base} <out_dir>  (-> save_pretrained)"""
 import sys
 
