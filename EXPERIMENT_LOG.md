@@ -25,7 +25,7 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-04, 17:44 EST `octo-small-50k-b64`: Octo-small training baseline
     - Changes: N/A
     - Expected: as above
-    - Results: 
+    - Results: 76.6% test success on LIBERO-Spatial benchmark; note Octo has pretraining on OXE robotics dataset for its transformer backbone
 - 2026-11-04, 17:44 EST `rt1x-smoke`: RT-1-X smoke
     - Changes: ported RT-1-X JAX model to Torch and parity tested at both fp64 and fp32; NOTE: ood inputs will cause spikes that, because of noise, can generate high error values
     - Expected: trainable model and reasonable model behaviour
@@ -33,4 +33,6 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-05, 00:43 EST `rt1x-1f-50k-b64`: RT1X training baseline
     - Changes: RT-1-X set up, baseline run
     - Expected: as above
-    - Results: 
+    - Results: <32% test success on LIBERO-Spatial benchmark; does NOT use the USE encoder and pretraining, only has ImageNet encoding 
+
+OVERALL: seems like it would be best both cost-wise and baseline-wise to compare against the Octo-small model
