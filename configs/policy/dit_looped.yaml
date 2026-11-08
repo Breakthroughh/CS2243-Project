@@ -1,0 +1,13 @@
+_target_: src.policies.dit_looped.LoopedDiTPolicy
+action_horizon: ${data.action_horizon}
+obs_horizon: ${data.obs_horizon}
+d_model: 256
+n_heads: 4
+n_pre_layers: 2
+n_loop_layers: 2
+n_post_layers: 2
+n_loops: 2
+n_train_steps: 100
+n_inference_steps: 100
+pretrained_vision: true
+lang_model: openai/clip-vit-base-patch32

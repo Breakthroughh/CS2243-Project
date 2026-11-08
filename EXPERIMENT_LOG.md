@@ -26,4 +26,12 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: increase training length 
     - Expected: 50% success on libero
     - Results: test score 87%
-        
+
+- 2026-11-08 Note:
+    - Want to modify Advikar's baseline-dit to loop as well (an additional inner loop using shared-weight layers for refinement, not just denoising steps), referencing Looped Diffusion Transformer paper https://arxiv.org/pdf/2609.40305, which uses 1. deep supervision so intermediate states become useful predictions themselves, and 2. self modulating attention to fix redundant attention updates when looping.
+    - Will first implement looping on 2/6 blocks (2 pre, 2 looped, 2 post) for ablation test.
+
+- 2026-11-08, 5:21pm `simple-looped-dit`: naively change baseline to have middle 2 blocks loop
+    - Changes: Implement looping on 2/6 blocks (2 pre, 2 looped, 2 post)
+    - Expected: Same or slight degradation in performance compared to baseline-dit
+    - Results: 
