@@ -3,6 +3,7 @@ The rest is scaffolding: protocol logging, test loss, eval schedule, atomic chec
 from pathlib import Path
 
 import torch
+from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 
 from src import checkpoint
@@ -33,9 +34,17 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
     start_epoch, step = 0, 0
     if path.exists():
         state = checkpoint.load(path)
+        saved_policy = state.get("policy_config")
+        config_path = path.with_name("config.yaml")
+        if saved_policy is None and config_path.exists():
+            saved_policy = OmegaConf.to_container(OmegaConf.load(config_path).policy, resolve=True)
+        checkpoint.validate_policy(cfg, saved_policy)
         policy.load_state_dict(state["policy"])
         optimizer.load_state_dict(state["optimizer"])
         start_epoch, step = state["epoch"], state["step"]
+
+    if cfg.train.max_steps is not None and step >= cfg.train.max_steps:
+        return step
 
     loader = DataLoader(train_set, cfg.train.batch_size, shuffle=True, drop_last=True, num_workers=cfg.train.num_workers)
     test_loader = DataLoader(test_set, cfg.train.batch_size, num_workers=cfg.train.num_workers)
@@ -47,7 +56,7 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
             step += 1
             logger.log({**{f"train/{k}": v.item() for k, v in out.items()}, "train/lr": optimizer.param_groups[0]["lr"],
                         "train/epoch": epoch, "train/step": step}, step)
-            if step == cfg.train.max_steps:
+            if cfg.train.max_steps is not None and step >= cfg.train.max_steps:
                 break
                 
         policy.eval()
@@ -56,7 +65,8 @@ def train(cfg, policy, train_set, test_set, logger, evaluate):
         logger.log({f"test/{k}": torch.stack([o[k] for o in outs]).mean().item() for k in outs[0]}, step)
         if (epoch + 1) % cfg.train.eval_every == 0:
             logger.log(evaluate(policy), step)
-        checkpoint.save(path, policy=policy.state_dict(), optimizer=optimizer.state_dict(), epoch=epoch + 1, step=step)
-        if step == cfg.train.max_steps:
+        checkpoint.save(path, policy=policy.state_dict(), optimizer=optimizer.state_dict(), epoch=epoch + 1, step=step,
+                        policy_config=OmegaConf.to_container(cfg.policy, resolve=True))
+        if cfg.train.max_steps is not None and step >= cfg.train.max_steps:
             break
     return step

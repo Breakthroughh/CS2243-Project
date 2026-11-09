@@ -9,6 +9,7 @@ import torch
 from hydra.utils import get_method, instantiate
 from omegaconf import OmegaConf
 
+from src import checkpoint
 from src.config import compose  # noqa: F401
 from src.data import build_datasets, resolve_root
 from src.logger import Logger
@@ -18,7 +19,14 @@ from src.rollout import evaluate
 def main(cfg):
     run_dir = Path(cfg.run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
+    config_path = run_dir / "config.yaml"
+    if config_path.exists():
+        saved_cfg = OmegaConf.load(config_path)
+        checkpoint.validate_policy(cfg, OmegaConf.to_container(saved_cfg.policy, resolve=True))
+    elif (run_dir / "latest.pt").exists():
+        state = checkpoint.load(run_dir / "latest.pt")
+        checkpoint.validate_policy(cfg, state.get("policy_config"))
+    config_path.write_text(OmegaConf.to_yaml(cfg))
     random.seed(cfg.seed), np.random.seed(cfg.seed), torch.manual_seed(cfg.seed)
     root = resolve_root(cfg)
     train_set, test_set = build_datasets(cfg, root)
