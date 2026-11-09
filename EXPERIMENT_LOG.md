@@ -39,3 +39,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: Implement looping on 2/6 blocks (2 pre, 2 looped, 2 post)
     - Expected: Same or slight degradation in performance compared to baseline-dit
     - Results: 79.4% on LIBERO Spatial as expected
+
+- 2026-11-08, 2:55pm `deepsup-looped-dit`: Add deep supervision to `simple-looped-dit`, still 2 loops
+    - Changes: Add deep supervision as in Looped DiT paper. Here loss fxn is just the sum L1 + L2.
+    - Expected: Improvement on `simple-looped-dit`
+    - Results: 
