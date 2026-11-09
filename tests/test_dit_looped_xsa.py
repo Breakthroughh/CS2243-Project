@@ -115,7 +115,7 @@ def test_loop_and_decoder_paths_use_xsa_and_receive_gradients():
 
 
 def test_config_sampler_and_hub_roundtrip(tmp_path):
-    cfg = compose(["policy=dit_looped_xsa", "data.action_horizon=4", "policy.d_model=16", "policy.n_heads=2",
+    cfg = compose(["policy=dit_looped_deepsup_xsa", "data.action_horizon=4", "policy.d_model=16", "policy.n_heads=2",
                    "policy.n_train_steps=10", "policy.n_inference_steps=5", "policy.pretrained_vision=false",
                    "policy.lang_model=mock"])
     policy = instantiate(cfg.policy).eval()
