@@ -1,0 +1,5 @@
+defaults:
+  - dit_looped
+  - _self_
+
+_target_: src.policies.dit_looped_deepsup.DeepSupervisedLoopedDiTPolicy
