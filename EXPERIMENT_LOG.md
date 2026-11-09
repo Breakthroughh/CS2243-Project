@@ -38,4 +38,4 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-08, 5:50pm `simple-looped-dit`: Naively change baseline to have middle 2 blocks loop
     - Changes: Implement looping on 2/6 blocks (2 pre, 2 looped, 2 post)
     - Expected: Same or slight degradation in performance compared to baseline-dit
-    - Results: 
+    - Results: 79.4% on LIBERO Spatial
