@@ -1,4 +1,4 @@
-"""Looped DiT with mean epsilon loss across refinement exits.
+"""Looped DiT with final-loop epsilon loss plus mean intermediate-loop loss.
 Dims: R refinement loops, B batch, P action horizon, A action (7), L context tokens, D model width.
 """
 import torch
@@ -37,5 +37,8 @@ class DeepSupervisedLoopedDiTPolicy(LoopedDiTPolicy):
         x_BPA = a_B11.sqrt() * action_BPA + (1 - a_B11).sqrt() * noise_BPA
         predictions_RBPA = self.denoise_loops(x_BPA, k_B, self.encode(batch))
         losses_R = torch.stack([F.mse_loss(prediction_BPA, noise_BPA) for prediction_BPA in predictions_RBPA])
-        return {"loss": losses_R.mean(),
+        loss = losses_R[-1]
+        if self.n_loops > 1:
+            loss = loss + losses_R[:-1].mean()
+        return {"loss": loss,
                 **{f"loss_loop_{r}": loss.detach() for r, loss in enumerate(losses_R, 1)}}

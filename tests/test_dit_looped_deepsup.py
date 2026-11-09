@@ -62,8 +62,8 @@ def test_shared_decoder_is_a_branch_not_recurrent_input():
         handle.remove()
 
 
-@pytest.mark.parametrize("n_loops", [1, 3])
-def test_mean_loss_shared_noise_target_and_per_loop_metrics(monkeypatch, n_loops):
+@pytest.mark.parametrize("n_loops", [1, 2, 4])
+def test_final_plus_mean_loss_shared_noise_target_and_per_loop_metrics(monkeypatch, n_loops):
     policy = DeepSupervisedLoopedDiTPolicy(**TINY, **SPLIT, n_loops=n_loops)
     activate(policy)
     b = batch()
@@ -84,12 +84,32 @@ def test_mean_loss_shared_noise_target_and_per_loop_metrics(monkeypatch, n_loops
     torch.testing.assert_close(denoise_loops.call_args.args[0], noisy_BPA)
     torch.testing.assert_close(denoise_loops.call_args.args[1], k_B)
     assert set(out) == {"loss", *(f"loss_loop_{r + 1}" for r in range(n_loops))}
-    torch.testing.assert_close(out["loss"], expected_R.mean())
+    expected_loss = expected_R[-1] + expected_R[:-1].mean() if n_loops > 1 else expected_R[0]
+    torch.testing.assert_close(out["loss"], expected_loss)
     for r, expected in enumerate(expected_R, 1):
         torch.testing.assert_close(out[f"loss_loop_{r}"], expected)
         assert not out[f"loss_loop_{r}"].requires_grad
     out["loss"].backward()
     assert policy.blocks[1].attn.in_proj_weight.grad.abs().sum() > 0
+
+
+@pytest.mark.parametrize("n_loops", [1, 2, 4])
+def test_final_plus_mean_gradient_weights(monkeypatch, n_loops):
+    policy = DeepSupervisedLoopedDiTPolicy(**TINY, **SPLIT, n_loops=n_loops)
+    b = batch()
+    predictions_RBPA = torch.randn(n_loops, 2, 4, 7, requires_grad=True)
+    monkeypatch.setattr(policy, "denoise_loops", lambda *args: predictions_RBPA)
+    monkeypatch.setattr(policy, "encode", lambda *args: None)
+    torch.manual_seed(5)
+    torch.randint(0, 10, (2,))
+    noise_BPA = torch.randn_like(b["action"])
+    torch.manual_seed(5)
+    policy.compute_loss(b)["loss"].backward()
+    weights_R = torch.ones(n_loops)
+    if n_loops > 1:
+        weights_R[:-1] = 1 / (n_loops - 1)
+    expected_RBPA = 2 * (predictions_RBPA.detach() - noise_BPA) * weights_R[:, None, None, None] / noise_BPA.numel()
+    torch.testing.assert_close(predictions_RBPA.grad, expected_RBPA)
 
 
 def test_sampler_only_decodes_final_exit(monkeypatch):

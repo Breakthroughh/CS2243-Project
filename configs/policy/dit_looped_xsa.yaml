@@ -1,0 +1,5 @@
+defaults:
+  - dit_looped_deepsup
+  - _self_
+
+_target_: src.policies.dit_looped_xsa.LoopedDiTXSAPolicy
