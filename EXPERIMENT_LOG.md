@@ -43,4 +43,9 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-08, 2:55pm `deepsup-looped-dit`: Add deep supervision to `simple-looped-dit`, still 2 loops
     - Changes: Add deep supervision as in Looped DiT paper. Here loss fxn is just the sum L1 + L2.
     - Expected: Improvement on `simple-looped-dit`
-    - Results: 
+    - Results: 84.8% on LIBERO Spatial, ok but not exceeding baseline
+
+- 2026-11-10, 11:57am `deepsup-xsa-looped-dit`: Add XSA to `deepsup-looped-dit`, still 2 loops
+    - Changes: Add XSA as in Looped DiT paper. Here loss fxn is just the sum L1 + L2.
+    - Expected: Slight improvement on `deepsup-looped-dit`
+    - Results: 88% on LIBERO Spatial, ok
