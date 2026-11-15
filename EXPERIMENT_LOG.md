@@ -54,3 +54,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: 4 loops instead of 2
     - Expected: Slight improvement on `deepsup-xsa-looped-dit`
     - Results: 
+
+- 2026-11-15, 3:40pm `l6-deepsup-xsa-looped-dit`: Above, but loop 6 times
+    - Changes: 6 loops instead of 2
+    - Expected: Slight improvement on `deepsup-xsa-looped-dit`
+    - Results: 
