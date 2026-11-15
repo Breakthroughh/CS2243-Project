@@ -49,3 +49,8 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: Add XSA as in Looped DiT paper. Here loss fxn is just the sum L1 + L2.
     - Expected: Slight improvement on `deepsup-looped-dit`
     - Results: 88% on LIBERO Spatial, ok
+
+- 2026-11-15, 3:35pm `l4-deepsup-xsa-looped-dit`: Above, but loop 4 times
+    - Changes: 4 loops instead of 2
+    - Expected: Slight improvement on `deepsup-xsa-looped-dit`
+    - Results: 
