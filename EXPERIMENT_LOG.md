@@ -60,4 +60,7 @@ Failed arms: branch, code changes, why it failed. -->
     - Expected: Slight improvement on `deepsup-xsa-looped-dit`
     - Results: 86.8% worse
 
-- 2026-11-17, 2:53pm `loop-convergence-analysis`: analysis of loops' representations
+- 2026-11-17, 2:53pm `loop-convergence-latest`: analysis of loops' representations
+    - Changes: N/A
+    - Expected: convergence done by 4 loops
+    - Results: 
