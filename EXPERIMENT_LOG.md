@@ -64,3 +64,7 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: N/A
     - Expected: convergence done by 4 loops
     - Results: 
+- 2026-11-17, 4:30pm `l6-loop-sweep`: eval on loops
+    - Changes: take finished model at 6 loop checkpoint at step 50000 and eval it with different num of loops
+    - Expected: evidence of changes between loops on the same model so the learning looper has signal to go off of
+    - Results

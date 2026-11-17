@@ -1,0 +1,2 @@
+loop: src.training.eval_only.train   # no training: load `checkpoint`, then src/run.py runs the final eval
+checkpoint: ???                      # another run's weights, e.g. /results/runs/exp/dit-looped/<run>/latest.pt
