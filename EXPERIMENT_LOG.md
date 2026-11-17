@@ -53,9 +53,11 @@ Failed arms: branch, code changes, why it failed. -->
 - 2026-11-15, 3:35pm `l4-deepsup-xsa-looped-dit`: Above, but loop 4 times
     - Changes: 4 loops instead of 2
     - Expected: Slight improvement on `deepsup-xsa-looped-dit`
-    - Results: 
+    - Results: 89.2% good
 
 - 2026-11-15, 3:40pm `l6-deepsup-xsa-looped-dit`: Above, but loop 6 times
     - Changes: 6 loops instead of 2
     - Expected: Slight improvement on `deepsup-xsa-looped-dit`
-    - Results: 
+    - Results: 86.8% worse
+
+- 2026-11-17, 2:53pm `loop-convergence-analysis`: analysis of loops' representations
