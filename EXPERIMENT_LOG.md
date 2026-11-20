@@ -69,7 +69,7 @@ Failed arms: branch, code changes, why it failed. -->
     - Expected: evidence of changes between loops on the same model so the learning looper has signal to go off of
     - Results
 
-- 2026-11-20, 1:27am `l4-untied-deepsup-dit`: 12 blocks, "untied" version of l4. 
+- 2026-11-20, 1:27am `l4-untied-deepsup-xsa-dit`: 12 blocks, "untied" version of `l4-deepsup-xsa-looped-dit`
     - Changes: control for good comparison
     - Expected: similar performance as l4, maybe a bit better
     - Results: 
