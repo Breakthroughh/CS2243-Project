@@ -20,6 +20,9 @@ class LoopedDiTPolicy(DiTPolicy):
         self.n_pre_layers, self.n_loop_layers = n_pre_layers, n_loop_layers
         self.n_post_layers, self.n_loops = n_post_layers, n_loops
 
+    def _refinement_stage(self, stage):
+        return self.blocks[self.n_pre_layers:self.n_pre_layers + self.n_loop_layers]
+
     def denoise(self, x_BPA, k_B, ctx_BLD):
         """Refine hidden states at fixed noise level/context, then decode once to epsilon [B,P,A]."""
         k_BD = self.step_mlp(timestep_embedding(k_B, self.action_emb_PD.shape[-1]))
@@ -27,8 +30,8 @@ class LoopedDiTPolicy(DiTPolicy):
         loop_end = self.n_pre_layers + self.n_loop_layers
         for block in self.blocks[:self.n_pre_layers]:
             h_BPD = block(h_BPD, ctx_BLD, k_BD)
-        for _ in range(self.n_loops):
-            for block in self.blocks[self.n_pre_layers:loop_end]:
+        for stage in range(self.n_loops):
+            for block in self._refinement_stage(stage):
                 h_BPD = block(h_BPD, ctx_BLD, k_BD)
         for block in self.blocks[loop_end:]:
             h_BPD = block(h_BPD, ctx_BLD, k_BD)

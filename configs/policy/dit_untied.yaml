@@ -1,0 +1,6 @@
+defaults:
+  - dit_looped_deepsup
+  - _self_
+
+_target_: src.policies.dit_untied.UntiedDiTPolicy
+n_loops: 4  # four distinct pairs of middle blocks

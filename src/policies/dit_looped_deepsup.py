@@ -19,8 +19,8 @@ class DeepSupervisedLoopedDiTPolicy(LoopedDiTPolicy):
             h_BPD = block(h_BPD, ctx_BLD, k_BD)
         shift, scale = self.final_ada(k_BD)[:, None].chunk(2, -1)
         predictions = []
-        for _ in range(self.n_loops):
-            for block in self.blocks[self.n_pre_layers:loop_end]:
+        for stage in range(self.n_loops):
+            for block in self._refinement_stage(stage):
                 h_BPD = block(h_BPD, ctx_BLD, k_BD)
             # The decoder branches off; the next refinement receives the pre-decoder state.
             out_BPD = h_BPD

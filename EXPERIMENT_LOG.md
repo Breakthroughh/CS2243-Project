@@ -68,3 +68,12 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: take finished model at 6 loop checkpoint at step 50000 and eval it with different num of loops
     - Expected: evidence of changes between loops on the same model so the learning looper has signal to go off of
     - Results
+
+- 2026-11-20, 1:27am `l4-untied-deepsup-dit`: 12 blocks, "untied" version of l4. 
+    - Changes: control for good comparison
+    - Expected: similar performance as l4, maybe a bit better
+    - Results: 
+
+- Todo:
+    - See at what point the l4 model stops getting better - the rollout success still increased a little.
+    - Need: less num params same training, we get comparable performance. Or, with same num params same training we get better performance. 
