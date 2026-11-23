@@ -1,0 +1,13 @@
+sweep,n_loops,n_inference_steps,test_mean_score,test_control_hz,git_commit,git_dirty,run_dir
+l6-loop-sweep,1,100,0.836,9.17,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=1
+l6-loop-sweep,2,100,0.844,6.78,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=2
+l6-loop-sweep,3,100,0.858,5.62,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=3
+l6-loop-sweep,4,100,0.814,4.68,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=4
+l6-loop-sweep,5,100,0.888,4.21,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=5
+l6-loop-sweep,6,100,0.838,3.54,a820873,true,/results/runs/exp/eval-sweep/l6-loop-sweep_policy.n_loops=6
+l6-steps-sweep,1,50,0.822,25.32,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=1_policy.n_inference_steps=50
+l6-steps-sweep,1,25,0.838,53.23,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=1_policy.n_inference_steps=25
+l6-steps-sweep,1,10,0.844,116.69,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=1_policy.n_inference_steps=10
+l6-steps-sweep,6,50,0.852,7.16,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=6_policy.n_inference_steps=50
+l6-steps-sweep,6,25,0.876,20.60,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=6_policy.n_inference_steps=25
+l6-steps-sweep,6,10,0.858,49.96,1a8ecfc,true,/results/runs/exp/eval-sweep/l6-steps-sweep_policy.n_loops=6_policy.n_inference_steps=10

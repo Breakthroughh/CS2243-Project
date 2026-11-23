@@ -68,3 +68,7 @@ Failed arms: branch, code changes, why it failed. -->
     - Changes: take finished model at 6 loop checkpoint at step 50000 and eval it with different num of loops
     - Expected: evidence of changes between loops on the same model so the learning looper has signal to go off of
     - Results
+- 2026-11-22, 1:52pm `l6-steps-sweep`: eval on steps
+    - Changes: eval same 6-loop checkpoint with different denoising steps and loops
+    = Expected: they might degrade together
+    - Results
